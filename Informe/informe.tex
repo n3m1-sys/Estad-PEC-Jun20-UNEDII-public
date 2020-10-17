@@ -1,0 +1,98 @@
+\documentclass[a4paper,5pt,titlepage]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[spanish]{babel}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{xcolor}
+\usepackage{listings}
+\usepackage{fancyhdr}
+\usepackage[a4paper, total={6in, 8in}]{geometry}
+
+\newcommand{\titulo}{Práctica 1, Ejercicio 1}
+\newcommand{\tituloc}{Práctica 1, Ejercicio 1}
+\newcommand{\asig}{Estadística}
+\newcommand{\asigc}{Estadística}
+
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{Martín Romera Sobrado}
+\lhead{\asigc: \tituloc}
+\cfoot{\thepage}
+
+\lstset{
+	language=R,
+	basicstyle=\ttfamily,
+	columns=fullflexible,
+	frame=single,
+	breaklines=true,
+	postbreak=\mbox{\textcolor{red}{$\hookrightarrow$}\space},
+}
+
+\begin{document}
+	El ejercicio que realizo en la práctica es el \textbf{Ejercicio 1}, usando el lenguaje \texttt{R}. Se omiten los enunciados de los ejercicios para optimizar el espacio.
+	\section{Apartado 1}
+		El siguiente código obtiene los valores aproximados de $E\{T_1\}$ y $E\{T_2\}$:
+		\begin{lstlisting}
+# Definimos las constantes
+# Numero de simulaciones
+B <- 10000
+# Tamano de las muestras aleatorias simples
+n <- c(10, 100, 1000)
+# Valor de theta
+theta = 2
+# Creamos dos matrices para guardar las diferentes simulaciones que se hagan con las diferentes muestras sobre los estimadores
+T1 <- matrix(nrow = B, ncol = length(n))
+T2 <- matrix(nrow = B, ncol = length(n))
+for (i in 1:B) {
+	for (j in 1:length(n)) {
+		# Obtenemos una muestra aleatoria simple de n = 10, 100 o 1000, dependiendo de la iteracion del segundo bucle
+		muestra <- rexp(n[j], theta)
+		# Aplicamos la funcion de T1 sobre la muestra y la guardamos en la posicion i = numero de la simulacion y j = log10(n) de la matriz T1
+		T1[i,j] <- 1 / mean(muestra)
+		# Aplicamos la funcion de T2 sobre la muestra y la guardamos en la posicion i = numero de la simulacion y j = log10(n) de la matriz T2
+		T2[i,j] <- (n[j] - 1) / sum(muestra)
+	}
+}
+# Calculamos el valor aproximado de la esperanza matematica de T1 y T2
+ET1 <- apply(T1, 2, mean)
+ET2 <- apply(T2, 2, mean)
+		\end{lstlisting}
+		Los vectores \texttt{ET1} y \texttt{ET2} tienen los valores de $E\{T_1\}$ y $E\{T_2\}$ para muestras de $n=10$, $n=100$ y $n=1000$. Un ejemplo de ejecución del código daría los siguientes resultados:
+		\begin{center}
+			\begin{tabular}{|c|c|c|c|}
+				\hline
+				$n=$  & 10 & 100 & 1000 \\
+				\hline
+				\hline
+				$E\{T_1\}$ & $2.218567$ & $2.019762$ & $2.002014$ \\
+				\hline
+				$E\{T_2\}$ & $1.996710$ & $1.999564$ & $2.000012$ \\
+				\hline
+			\end{tabular}
+		\end{center}
+		Podemos ver que los valores aporximados de la esperanza matemática de ambos estimadores se aproximan a $\theta$, más si el tamaño de la muestra crece. Sin embargo, los valores de $E\{T_2\}$ son más cercanos a $\theta$ que los de $E\{T_1\}$.
+	\newpage		
+	\section{Apartado 2}
+		Para la aproximación del sesgo de los estimadores, tras una ejecución del código previo, ejecutamos las siguientes lineas:
+		\begin{lstlisting}
+bT1 = ET1 - theta
+bT2 = ET2 - theta
+		\end{lstlisting}
+		Siendo \texttt{bT1} y \texttt{bT2}, dos vectores que tienen el valor $b$ (aproximación del sesgo), para los dos estimadores en los diferentes espacios muestrales. Partiendo de los resultados previos, obtenemos los siguientes valores:
+		\begin{center}
+			\begin{tabular}{|c|c|c|c|}
+				\hline
+				$n=$  & 10 & 100 & 1000 \\
+				\hline
+				\hline
+				$b_{T_1}$ & $0.218566725$ & $0.0197619925$ & $2.014069\cdot10^{-3}$ \\
+				\hline
+				$b_{T_2}$ & $-0.003289947$ & $-0.0004356274$ & $1.205515 \cdot10^{-5}$ \\
+				\hline
+			\end{tabular}
+		\end{center}
+		Observamos que el sesgo disminuye en ambos estimadores según crece el espacio muestral. También y como habíamos predicho en el apartado anterior, los valores de $E\{T_2\}$ se aproximan más a $\theta$ que los de $E\{T_1\}$, lo que hace que $|b_{T_2}|$ sea menor para cualquiera de los espacios muestrales y el sesgo sea menor y se emplearía el estimador $T_2$. 
+\end{document}
